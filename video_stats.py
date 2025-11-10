@@ -2,6 +2,7 @@ import requests
 import json
 import os
 from dotenv import load_dotenv
+from datetime import date
 
 load_dotenv(dotenv_path='./.env')
 
@@ -23,8 +24,6 @@ def get_playlist_id():
 
         channel_items = data['items'][0]
         channel_playlistId = channel_items['contentDetails']['relatedPlaylists']['uploads']
-
-        print(f"Channel Uploads Playlist ID: {channel_playlistId}")
         
         return channel_playlistId
     except requests.exceptions.RequestException as e:
@@ -106,14 +105,24 @@ def extract_video_data(video_ids):
                 }
                 
                 extracted_data.append(video_data)
-            return extracted_data
+                
+        return extracted_data
             
     except requests.exceptions.RequestException as e:
         print(f"An error occurred while extracting video data: {e}")
         raise
+    
+def save_to_json(extracted_data):
+    file_path = f"./data/YT_data_{date.today()}.json"
+    
+    with open(file_path, "w", encoding="utf-8") as json_outfile:
+        json.dump(extracted_data, json_outfile, indent=4, ensure_ascii=False)
+    
+    
+    
         
 if __name__ == "__main__":
     playlistId = get_playlist_id() 
     video_ids = get_video_ids(playlistId)
-    ex = extract_video_data(video_ids)
-    print(ex)
+    video_data = extract_video_data(video_ids)
+    save_to_json(video_data)
