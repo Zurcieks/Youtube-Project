@@ -1,16 +1,16 @@
 import requests
 import json
-import os
-from dotenv import load_dotenv
 from datetime import date
-
-load_dotenv(dotenv_path='./.env')
+import os
+from airflow.decorators import task
+import json
 
 API_KEY = os.getenv('API_KEY')
+
 CHANNEL_HANDLE = os.getenv('CHANNEL_HANDLE')
 maxResults = 50
 
-
+@task
 def get_playlist_id():  
     
     try:
@@ -30,7 +30,7 @@ def get_playlist_id():
         print(f"An error occurred while fetching the playlist ID: {e}")
         raise
     
-
+@task
 def get_video_ids(playlistId):
     video_ids = []
     pageToken = None
@@ -41,7 +41,7 @@ def get_video_ids(playlistId):
         
         while True:
             url = base_url
-            # Add pageToken to the URL if it exists
+
             if pageToken:
                 url += f"&pageToken={pageToken}"
             
@@ -50,11 +50,11 @@ def get_video_ids(playlistId):
             response.raise_for_status()
             
             data = response.json()
-            # Extract video IDs from the response
+
             for item in data.get('items', []):
                 video_id = item['contentDetails']['videoId']
                 video_ids.append(video_id)
-            # Get the next page token
+
             pageToken = data.get('nextPageToken')
             
             if not pageToken:
@@ -67,7 +67,7 @@ def get_video_ids(playlistId):
         raise
     
 
-        
+@task        
 def extract_video_data(video_ids):
     
     extracted_data = []
@@ -111,7 +111,7 @@ def extract_video_data(video_ids):
     except requests.exceptions.RequestException as e:
         print(f"An error occurred while extracting video data: {e}")
         raise
-    
+@task    
 def save_to_json(extracted_data):
     file_path = f"./data/YT_data_{date.today()}.json"
     
