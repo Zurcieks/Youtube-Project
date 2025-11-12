@@ -11,15 +11,14 @@ default_args = {
     "email_on_failure": False,
     "email_on_retry": False,
     "email": "data@engineers.com",
-    # 'retries': 1,
-    # 'retry_delay': timedelta(minutes=5),
+    'retries': 1,
+    'retry_delay': timedelta(minutes=5),
     "max_active_runs": 1,
     "dagrun_timeout": timedelta(hours=1),
     "start_date": datetime(2025, 1, 1, tzinfo=local_tz),
-    # 'end_date': datetime(2030, 12, 31, tzinfo=local_tz),
 }
 with DAG(
-    dag_id="produce_json",
+    dag_id="youtube_data",
     default_args=default_args,
     description="DAG to produce JSON file with raw data",
     schedule="0 14 * * *",
